@@ -1,5 +1,7 @@
 from pathlib import Path
 from matplotlib.image import imread, imsave
+import random
+
 
 
 def rgb2gray(rgb):
@@ -51,17 +53,31 @@ class Img:
             self.data[i] = res
 
     def rotate(self):
-        # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+        self.data = [list(reversed(col))for col in zip(*self.data)]
 
     def salt_n_pepper(self):
-        # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+        for i in range(len(self.data)):
+            for j in range(len(self.data[i])):
+                rand = random.random()
+                if rand < 0.2:
+                    self.data[i][j] = 255
+                elif rand > 0.8:
+                    self.data[i][j] = 0
+
+
 
     def concat(self, other_img, direction='horizontal'):
-        # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+        if direction != 'horizontal':
+            raise NotImplementedError("Only horizontal concatenation is supported")
+        if len(self.data) != len(other_img.data):
+            raise  RuntimeError("Image heights don't match")
+        concatenated = []
+        for row1,row2 in zip(self.data,other_img.data):
+            concatenated.append(row1+row2)
+
+        self.data = concatenated
 
     def segment(self):
-        # TODO remove the `raise` below, and write your implementation
-        raise NotImplementedError()
+        for i in range(len(self.data)):
+            for j in range(len(self.data[i])):
+                self.data[i][j] = 255 if self.data[i][j] > 100 else 0
