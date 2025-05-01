@@ -13,6 +13,7 @@ The bot supports the following image processing operations:
 - **contour** – Applies a contour filter to highlight edges.
 - **segment** – Performs binary segmentation (black and white), useful for high-contrast analysis.
 - **salt and pepper** – Adds random noise to simulate corrupted data.
+- **concat** – Horizontally joins exactly two photos into one image. Useful for comparison or merging visuals.
 
 ---
 
