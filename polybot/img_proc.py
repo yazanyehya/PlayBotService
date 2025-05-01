@@ -51,22 +51,12 @@ class Img:
                 res.append(abs(row[j-1] - row[j]))
 
             self.data[i] = res
-    #zip(*self.data) – Transpose the matrix (convert rows to columns).
-    # reversed(col) – Reverse each column to rotate clockwise.
-    # list(...) – Convert each reversed column back to a list.
+
     def rotate(self):
         self.data = [list(reversed(col))for col in zip(*self.data)]
 
 
-    #Conditions:
-# if rand < 0.2:
-# About 20% of the time, set pixel to 255 (salt)
-#
-# elif rand > 0.8:
-# About 20% of the time, set pixel to 0 (pepper)
-#
-# else:
-# (The remaining 60% of time) → leave the pixel unchanged
+
     def salt_n_pepper(self):
         for i in range(len(self.data)):
             for j in range(len(self.data[i])):

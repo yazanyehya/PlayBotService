@@ -4,22 +4,15 @@ import os
 import time
 from telebot.types import InputFile
 from polybot.img_proc import Img
+from collections import defaultdict
 
 
 class Bot:
-
     def __init__(self, token, telegram_chat_url):
-        # create a new instance of the TeleBot class.
-        # all communication with Telegram servers are done using self.telegram_bot_client
         self.telegram_bot_client = telebot.TeleBot(token)
-
-        # remove any existing webhooks configured in Telegram servers
         self.telegram_bot_client.remove_webhook()
         time.sleep(0.5)
-
-        # set the webhook URL
         self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60)
-
         logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
 
     def send_text(self, chat_id, text):
@@ -32,10 +25,6 @@ class Bot:
         return 'photo' in msg
 
     def download_user_photo(self, msg):
-        """
-        Downloads the photos that sent to the Bot to `photos` directory (should be existed)
-        :return:
-        """
         if not self.is_current_msg_photo(msg):
             raise RuntimeError(f'Message content of type \'photo\' expected')
 
@@ -54,14 +43,9 @@ class Bot:
     def send_photo(self, chat_id, img_path):
         if not os.path.exists(img_path):
             raise RuntimeError("Image path doesn't exist")
-
-        self.telegram_bot_client.send_photo(
-            chat_id,
-            InputFile(img_path)
-        )
+        self.telegram_bot_client.send_photo(chat_id, InputFile(img_path))
 
     def handle_message(self, msg):
-        """Bot Main message handler"""
         logger.info(f'Incoming message: {msg}')
         self.send_text(msg['chat']['id'], f'Your original message: {msg["text"]}')
 
@@ -69,20 +53,26 @@ class Bot:
 class QuoteBot(Bot):
     def handle_message(self, msg):
         logger.info(f'Incoming message: {msg}')
-
         if msg["text"] != 'Please don\'t quote me':
             self.send_text_with_quote(msg['chat']['id'], msg["text"], quoted_msg_id=msg["message_id"])
 
 
 class ImageProcessingBot(Bot):
+    media_group_cache = {}
+
     def handle_message(self, msg):
         logger.info(f'Incoming message: {msg}')
         chat_id = msg['chat']['id']
+        group_id = msg.get('media_group_id')
+
+        # Initialize media group cache if not already
+        if not hasattr(self, 'media_group_cache'):
+            self.media_group_cache = {}
 
         # Handle /start
         if 'text' in msg and msg['text'].strip().lower() == '/start':
             self.send_text(chat_id,
-                           "👋 Welcome! I'm your image assistant bot.\n\nSend me a photo with a caption like `rotate`, `blur`, or `segment`, and I’ll apply the filter for you.")
+                           "👋 Welcome! Send a photo with a caption like `rotate`, `blur`, or `segment`, or send 2 photos with caption `concat` to join them.")
             return
 
         # Handle /help
@@ -95,12 +85,46 @@ class ImageProcessingBot(Bot):
                 "- `rotate blur`\n"
                 "- `blur 2 contour`\n"
                 "- `rotate 2 blur 3`\n\n"
+                "Or send *2 photos* with caption `concat` to merge them horizontally.\n"
                 "You can also *reply to a photo* with a command like `rotate` or `blur 2`."
             )
             self.send_text(chat_id, help_message)
             return
 
-        # Filter map
+        # Handle media group for concat
+        if group_id:
+            if group_id not in self.media_group_cache:
+                self.media_group_cache[group_id] = []
+            self.media_group_cache[group_id].append(msg)
+
+            if len(self.media_group_cache[group_id]) < 2:
+                return  # Wait for second image
+
+            if len(self.media_group_cache[group_id]) == 2:
+                messages = self.media_group_cache.pop(group_id)
+                caption = messages[0].get('caption', '').strip().lower()
+
+                if caption != 'concat':
+                    self.send_text(chat_id, "Please use `concat` as caption when sending 2 photos.")
+                    return
+
+                try:
+                    path1 = self.download_user_photo(messages[0])
+                    path2 = self.download_user_photo(messages[1])
+
+                    img1 = Img(path1)
+                    img2 = Img(path2)
+
+                    img1.concat(img2)
+                    result_path = img1.save_img()
+
+                    self.send_photo(chat_id, result_path)
+                except Exception as e:
+                    logger.exception("Concat failed")
+                    self.send_text(chat_id, "❌ Failed to concatenate the two images.")
+                return
+
+        # Handle normal photo with caption or reply command
         filter_map = {
             'blur': 'blur',
             'contour': 'contour',
@@ -138,14 +162,13 @@ class ImageProcessingBot(Bot):
                 self.send_text(chat_id, f"❌ Unsupported filter: {filter_name}")
                 return
 
-            # Try to get repeat count
             count = 1
             if i + 1 < len(parts) and parts[i + 1].isdigit():
                 count = int(parts[i + 1])
                 if filter_name in segment_strict:
                     self.send_text(chat_id, f"⚠️ `{filter_name}` does not support repeat count.")
                     return
-                i += 1  # skip the count
+                i += 1
             elif filter_name in segment_strict and i + 1 < len(parts) and parts[i + 1].isdigit():
                 self.send_text(chat_id, f"⚠️ `{filter_name}` does not support repeat count.")
                 return
@@ -154,11 +177,9 @@ class ImageProcessingBot(Bot):
             i += 1
 
         try:
-            # Download image
             image_path = self.download_user_photo(photo_msg)
             logger.info(f"Photo saved at {image_path}")
 
-            # Apply filters in sequence
             img = Img(image_path)
             for method_name, repeat in commands:
                 filter_func = getattr(img, method_name)
@@ -166,7 +187,6 @@ class ImageProcessingBot(Bot):
                     filter_func()
             filtered_path = img.save_img()
 
-            # Send result
             self.send_photo(chat_id, filtered_path)
 
         except Exception as e:
