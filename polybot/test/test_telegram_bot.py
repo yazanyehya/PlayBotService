@@ -99,6 +99,51 @@ class TestBot(unittest.TestCase):
         contains_retry = any(keyword in text.lower() for keyword in retry_keywords)
         self.assertTrue(contains_retry, f"Error message was not sent to the user. Make sure your message contains one of {retry_keywords}")
 
+    def test_rotate_multiple_times(self):
+        mock_msg['caption'] = 'rotate 3'
+        with patch('polybot.img_proc.Img.rotate') as mock_rotate:
+            self.bot.handle_message(mock_msg)
+            self.assertEqual(mock_rotate.call_count, 3)
+            self.bot.telegram_bot_client.send_photo.assert_called_once()
+
+    def test_segment_with_number_should_fail(self):
+        mock_msg['caption'] = 'segment 2'
+        self.bot.telegram_bot_client.send_message = MagicMock()
+        self.bot.handle_message(mock_msg)
+        self.bot.telegram_bot_client.send_message.assert_called_once()
+        args = self.bot.telegram_bot_client.send_message.call_args[0]
+        self.assertIn('does not support repeat count', args[1])
+
+    def test_invalid_caption(self):
+        mock_msg['caption'] = 'flip'
+        self.bot.telegram_bot_client.send_message = MagicMock()
+        self.bot.handle_message(mock_msg)
+        self.bot.telegram_bot_client.send_message.assert_called_once()
+        args = self.bot.telegram_bot_client.send_message.call_args[0]
+        self.assertIn('Unsupported filter', args[1])
+
+    def test_help_command(self):
+        help_msg = {
+            'chat': {'id': 1243002838},
+            'text': '/help'
+        }
+        self.bot.telegram_bot_client.send_message = MagicMock()
+        self.bot.handle_message(help_msg)
+        self.bot.telegram_bot_client.send_message.assert_called_once()
+        args = self.bot.telegram_bot_client.send_message.call_args[0]
+        self.assertIn('Image Assistant Bot Help', args[1])
+
+    def test_start_command(self):
+        start_msg = {
+            'chat': {'id': 1243002838},
+            'text': '/start'
+        }
+        self.bot.telegram_bot_client.send_message = MagicMock()
+        self.bot.handle_message(start_msg)
+        self.bot.telegram_bot_client.send_message.assert_called_once()
+        args = self.bot.telegram_bot_client.send_message.call_args[0]
+        self.assertIn('Welcome', args[1])
+
 
 if __name__ == '__main__':
     unittest.main()
