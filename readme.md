@@ -1,4 +1,3 @@
-readme_content = """
 # 🤖 Telegram Image Processing Bot
 
 This bot is a Telegram assistant that lets users process images using a set of simple, caption-based commands. It responds to both direct photo messages and replies, making it a flexible and user-friendly tool for performing common image transformations.
@@ -100,5 +99,4 @@ All communication with Telegram is done through `pyTelegramBotAPI`. Flask is use
 The image processing is handled using a custom `Img` class that wraps functionality from the `PIL` (Pillow) library.
 
 ---
-"""
 
