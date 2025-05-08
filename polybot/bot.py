@@ -189,7 +189,7 @@ class ImageProcessingBot(Bot):
                 try:
                     with open(image_path, 'rb') as img_file:
                         res = requests.post(
-                            "http://localhost:8081/predict",  # or your actual YOLO URL
+                            "http://10.0.1.162:8081/predict",  # or your actual YOLO URL
                             files={"file": img_file}
                         )
                     if res.status_code != 200:
