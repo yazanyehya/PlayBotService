@@ -5,6 +5,9 @@ import time
 from telebot.types import InputFile
 from polybot.img_proc import Img
 from collections import defaultdict
+import requests
+from collections import Counter
+
 
 
 class Bot:
@@ -131,6 +134,7 @@ class ImageProcessingBot(Bot):
             'rotate': 'rotate',
             'segment': 'segment',
             'salt_and_pepper': 'salt_n_pepper',
+            'detect':'detect',
         }
         segment_strict = {'segment'}
 
@@ -179,6 +183,32 @@ class ImageProcessingBot(Bot):
         try:
             image_path = self.download_user_photo(photo_msg)
             logger.info(f"Photo saved at {image_path}")
+            # Check if detect is in commands
+            detect_commands = [cmd for cmd in commands if cmd[0] == 'detect']
+            if detect_commands:
+                try:
+                    with open(image_path, 'rb') as img_file:
+                        res = requests.post(
+                            "http://localhost:8081/predict",  # or your actual YOLO URL
+                            files={"file": img_file}
+                        )
+                    if res.status_code != 200:
+                        self.send_text(chat_id, "❌ Failed to connect to object detection service.")
+                        return
+
+                    result = res.json()
+                    labels = result.get('labels', [])
+                    if labels:
+                        label_counts = Counter(labels)
+                        formatted = "\n".join([f"- {label} (×{count})" for label, count in label_counts.items()])
+                        self.send_text(chat_id, f"🎯 Detected objects:\n{formatted}")
+                    else:
+                        self.send_text(chat_id, "✅ No objects detected.")
+
+                except Exception as e:
+                    logger.exception("Detection failed")
+                    self.send_text(chat_id, "❌ Error during object detection.")
+                return  # Skip local filters if 'detect' was used
 
             img = Img(image_path)
             for method_name, repeat in commands:
