@@ -1,4 +1,4 @@
-name: Simple CI Test
+name: simple-ci-check
 
 on:
   pull_request:
@@ -7,7 +7,8 @@ on:
 
 jobs:
   basic-test:
+    name: ✅ Simple CI Check
     runs-on: ubuntu-latest
     steps:
       - name: Say Hello
-        run: echo " Workflow ran successfully!"
+        run: echo "✅ Workflow ran successfully!"
