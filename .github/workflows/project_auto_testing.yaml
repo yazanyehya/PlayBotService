@@ -1,38 +1,41 @@
 name: Project auto-testing
+
 on:
-  push:
+  pull_request:
     branches:
       - main
-
-permissions: {}
 
 jobs:
   TestImgProcessingChatbotApp:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/checkout@v2
-        with:
-          repository: alonitac/ImageProcessingChatBotProject
-          path: ImageProcessingChatBotProjectOriginal
-      - name: Copy test files
-        run: mv -f ImageProcessingChatBotProjectOriginal/polybot/test/* polybot/test/
-      - name: Install dependencies
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Dependencies
         run: |
           pip install -r polybot/requirements.txt
-      - name: Test filters
+
+      - name: Test concat
         run: |
           echo -e "\n\nTesting concat()\n"
           python -m polybot.test.test_concat
-          
+
+      - name: Test rotate
+        run: |
           echo -e "\n\nTesting rotate()\n"
           python -m polybot.test.test_rotate
-          
+
+      - name: Test salt_n_pepper
+        run: |
           echo -e "\n\nTesting salt_n_pepper()\n"
           python -m polybot.test.test_salt_n_pepper
-          
+
+      - name: Test segment
+        run: |
           echo -e "\n\nTesting segment()\n"
           python -m polybot.test.test_segment
-      - name: Test bot
+
+      - name: Test telegram bot
         run: |
           python -m polybot.test.test_telegram_bot
