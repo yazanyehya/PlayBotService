@@ -1,0 +1,14 @@
+name: simple-ci-check
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  basic-test:
+    name: ✅ Simple CI Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Say Hello
+        run: echo "✅ Workflow ran successfully!"
