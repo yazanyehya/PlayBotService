@@ -1,7 +1,7 @@
 from pathlib import Path
 from matplotlib.image import imread, imsave
 import random
-from PIL import ImageFilter
+from PIL import Image, ImageFilter
 
 
 def rgb2gray(rgb):
