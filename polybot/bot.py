@@ -7,7 +7,13 @@ from polybot.img_proc import Img
 from collections import defaultdict
 import requests
 from collections import Counter
+import boto3
+from uuid import uuid4
 
+AWS_REGION = os.getenv("AWS_REGION", "eu-central-1")
+AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
+
+s3_client = boto3.client("s3", region_name=AWS_REGION)
 
 
 class Bot:
@@ -135,6 +141,7 @@ class ImageProcessingBot(Bot):
             'segment': 'segment',
             'salt_and_pepper': 'salt_n_pepper',
             'detect':'detect',
+            'sharpen': 'sharpen',
         }
         segment_strict = {'segment'}
 
@@ -189,7 +196,7 @@ class ImageProcessingBot(Bot):
                 try:
                     with open(image_path, 'rb') as img_file:
                         res = requests.post(
-                            "http://10.0.1.162:8081/predict",  # or your actual YOLO URL
+                            "http://10.0.1.162:8081/predict", 
                             files={"file": img_file}
                         )
                     if res.status_code != 200:
