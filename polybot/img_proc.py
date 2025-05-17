@@ -1,7 +1,7 @@
 from pathlib import Path
 from matplotlib.image import imread, imsave
 import random
-
+from PIL import ImageFilter
 
 
 def rgb2gray(rgb):
@@ -83,3 +83,8 @@ class Img:
         for i in range(len(self.data)):
             for j in range(len(self.data[i])):
                 self.data[i][j] = 255 if self.data[i][j] > 100 else 0
+
+
+    def sharpen(image: Image.Image) -> Image.Image:
+        return image.filter(ImageFilter.SHARPEN)
+
