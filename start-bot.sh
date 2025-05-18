@@ -3,11 +3,11 @@
 # Your Telegram bot token
 export TELEGRAM_BOT_TOKEN=7661231941:AAE72m4R-mUSRVNRGlo24v5bxwF2b8wSkcI
 
-# Optional: Auth token (only needed once)
-ngrok config add-authtoken 2Q9QH5Gpabh5fmYbvSI6WBsnIFj_7ej3rHUkBw7wiizCiTTW9
+# ✅ REMOVE THIS LINE: it should only be run ONCE manually
+# ngrok config add-authtoken ...
 
 # Start ngrok in background
-/home/ubuntu/.nvm/versions/node/v20.9.0/bin/ngrok http 8443 > /dev/null &
+/usr/local/bin/ngrok http 8443 > /dev/null &
 sleep 3  # Wait a few seconds for ngrok to initialize
 
 # Get the public URL from ngrok API

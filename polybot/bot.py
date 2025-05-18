@@ -89,7 +89,7 @@ class ImageProcessingBot(Bot):
             help_message = (
                 "🤖 *Image Assistant Bot Help*\n\n"
                 "Send a photo with one or more of these commands (optionally with repeat count):\n"
-                "- `rotate`, `blur`, `contour`, `segment`, `salt_and_pepper`\n"
+                "- `rotate`, `blur`, `contour`, `segment`, `salt and pepper`\n"
                 "Examples:\n"
                 "- `rotate blur`\n"
                 "- `blur 2 contour`\n"
