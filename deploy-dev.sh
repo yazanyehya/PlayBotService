@@ -1,7 +1,7 @@
 #!/bin/bash
 
 SERVICE_NAME="polybot-dev.service"
-PROJECT_DIR="/home/ubuntu/PolybotService"
+PROJECT_DIR="/home/ubuntu/PlayBotService"
 SERVICE_FILE="$PROJECT_DIR/$SERVICE_NAME"
 
 echo "🚀 Deploying $SERVICE_NAME..."
