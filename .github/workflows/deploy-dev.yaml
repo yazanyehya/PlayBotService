@@ -1,0 +1,41 @@
+name: Yolo Dev Deploy
+
+on:
+  push:
+    branches:
+      - dev
+  workflow_dispatch:
+
+env:
+  REPO_URL: ${{ github.server_url }}/${{ github.repository }}.git
+  REPO_NAME: ${{ github.event.repository.name }}
+
+jobs:
+  Deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure SSH (shared key)
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/private_key
+          chmod 400 ~/.ssh/private_key
+
+      - name: ✅ Test SSH connection to DEV
+        run: |
+          ssh -i ~/.ssh/private_key -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEV_EC2_HOST }} "echo ✅ Connected to YOLO Dev EC2!"
+
+      - name: 🔄 Pull or Clone Repository on DEV
+        run: |
+          ssh -i ~/.ssh/private_key -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEV_EC2_HOST }} \
+          "if [ -d ~/${REPO_NAME} ]; then cd ~/${REPO_NAME} && git pull; else git clone ${REPO_URL} ~/${REPO_NAME}; fi"
+
+      - name: 🚀 Run Deploy Script on DEV
+        run: |
+          ssh -i ~/.ssh/private_key -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEV_EC2_HOST }} \
+          "cd ~/${REPO_NAME} && bash deploy.sh"
