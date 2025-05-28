@@ -4,8 +4,8 @@ After=network.target
 
 [Service]
 User=ubuntu
-WorkingDirectory=/home/ubuntu/PolybotService
-ExecStart=/home/ubuntu/PolybotService/venv/bin/python3 -m polybot.app
+WorkingDirectory=/home/ubuntu/PlayBotService
+ExecStart=/home/ubuntu/PlayBotService/venv/bin/python3 -m polybot.app
 Restart=always
 RestartSec=5
 Environment=TELEGRAM_BOT_TOKEN=7661231941:AAE72m4R-mUSRVNRGlo24v5bxwF2b8wSkcI
