@@ -206,14 +206,21 @@ class ImageProcessingBot(Bot):
             detect_commands = [cmd for cmd in commands if cmd[0] == 'detect']
             if detect_commands:
                 try:
-                    res = requests.post(
+                    response = requests.post(
                         f"{YOLO_URL}/predict",
-                        json={"image_key": s3_key}
+                        json={"image_name": image_name},
+                        timeout=10
                     )
+                    logger.info(f"📥 YOLO response: {response.status_code} - {response.text}")
 
-                    if res.status_code != 200:
-                        self.send_text(chat_id, "❌ Failed to connect to object detection service.")
-                        return
+                    if response.status_code == 200:
+                        self.send_text(chat_id, f"✅ YOLO result:\n{response.text}")
+                    else:
+                        self.send_text(chat_id, "❌ YOLO service failed.")
+                except Exception as e:
+                    logger.error(f"❌ Failed to call YOLO: {e}")
+                    self.send_text(chat_id, "❌ Failed to analyze image.")
+                    return
 
                     result = res.json()
                     labels = result.get('labels', [])
