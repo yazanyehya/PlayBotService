@@ -9,7 +9,9 @@ import requests
 from collections import Counter
 import boto3
 from uuid import uuid4
+import os
 
+YOLO_URL = os.environ.get("YOLO_URL")
 AWS_REGION = os.getenv("AWS_REGION", "eu-central-1")
 AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 
@@ -196,8 +198,9 @@ class ImageProcessingBot(Bot):
                 try:
                     with open(image_path, 'rb') as img_file:
                         res = requests.post(
-                            "http://10.0.1.162:8081/predict", 
-                            files={"file": img_file}
+                            f"{YOLO_URL}/predict",
+                            files={"image": img_file}
+
                         )
                     if res.status_code != 200:
                         self.send_text(chat_id, "❌ Failed to connect to object detection service.")
