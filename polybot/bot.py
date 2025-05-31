@@ -93,7 +93,7 @@ class ImageProcessingBot(Bot):
                 "Examples:\n"
                 "- `rotate blur`\n"
                 "- `blur 2 contour`\n"
-                "- `rotate 2 blur 3`\n\n"
+                "- `rotate 3 blur 3`\n\n"
                 "Or send *2 photos* with caption `concat` to merge them horizontally.\n"
                 "You can also *reply to a photo* with a command like `rotate` or `blur 2`."
             )
