@@ -212,7 +212,11 @@ class ImageProcessingBot(Bot):
                     )
 
                     if res.status_code != 200:
-                        self.send_text(chat_id, "❌ Failed to connect to object detection service.")
+                        try:
+                            error_msg = res.json().get("detail", res.text)
+                        except Exception:
+                            error_msg = res.text
+                        self.send_text(chat_id, f"❌ Object detection failed: {error_msg}")
                         return
 
                     result = res.json()
