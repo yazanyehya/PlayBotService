@@ -1,15 +1,14 @@
 import telebot
 from loguru import logger
-import os
 import time
 from telebot.types import InputFile
 from polybot.img_proc import Img
-from collections import defaultdict
 import requests
 from collections import Counter
 import boto3
-from uuid import uuid4
+import os
 
+YOLO_URL = os.environ.get("YOLO_URL")
 AWS_REGION = os.getenv("AWS_REGION", "eu-central-1")
 AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 
@@ -190,17 +189,34 @@ class ImageProcessingBot(Bot):
         try:
             image_path = self.download_user_photo(photo_msg)
             logger.info(f"Photo saved at {image_path}")
+
+            # NEW: Upload to S3
+            image_filename = os.path.basename(image_path)
+            s3_key = f"{chat_id}/original/{image_filename}"
+
+            try:
+                s3_client.upload_file(image_path, AWS_S3_BUCKET, s3_key)
+                logger.info(f"✅ Uploaded {s3_key} to S3 bucket: {AWS_S3_BUCKET}")
+            except Exception as e:
+                logger.error(f"❌ Failed to upload to S3: {e}")
+                self.send_text(chat_id, "❌ Failed to upload image to storage.")
+                return
+
             # Check if detect is in commands
             detect_commands = [cmd for cmd in commands if cmd[0] == 'detect']
             if detect_commands:
                 try:
-                    with open(image_path, 'rb') as img_file:
-                        res = requests.post(
-                            "http://10.0.1.162:8081/predict", 
-                            files={"file": img_file}
-                        )
+                    res = requests.post(
+                        f"{YOLO_URL}/predict",
+                        json={"image_key": s3_key}
+                    )
+
                     if res.status_code != 200:
-                        self.send_text(chat_id, "❌ Failed to connect to object detection service.")
+                        try:
+                            error_msg = res.json().get("detail", res.text)
+                        except Exception:
+                            error_msg = res.text
+                        self.send_text(chat_id, f"❌ Object detection failed: {error_msg}")
                         return
 
                     result = res.json()

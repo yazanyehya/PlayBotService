@@ -1,0 +1,18 @@
+[Unit]
+Description=Polybot Telegram Bot - DEV
+After=network.target
+
+[Service]
+User=ubuntu
+WorkingDirectory=/home/ubuntu/PlayBotService
+ExecStart=/home/ubuntu/PlayBotService/venv/bin/python3 -m polybot.app
+Restart=always
+RestartSec=5
+Environment=TELEGRAM_BOT_TOKEN=8114485374:AAEd8gZSRBuOQUu8w10IIZVbQQN_WNJuqmU
+Environment=YOLO_URL=http://10.0.1.226:11435
+Environment=AWS_BUCKET=yazan-dev-images-polybot
+Environment=BOT_APP_URL=https://d941-52-53-244-240.ngrok-free.app
+
+
+[Install]
+WantedBy=multi-user.target
