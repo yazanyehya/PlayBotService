@@ -25,17 +25,17 @@ def webhook():
 if __name__ == "__main__":
     bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, BOT_APP_URL)
 
-    # 👇 TEMP: Set Telegram webhook with self-signed certificate
+    try:
+        with open("polybot-dev.crt", "rb") as cert:
+            telegram_bot = Bot(token=TELEGRAM_BOT_TOKEN)
+            telegram_bot.set_webhook(
+                url="https://yazanpolybot-dev.fursa.click/",
+                certificate=cert
+            )
+            print("✅ Webhook set successfully")
+    except Exception as e:
+        print("⚠️ Failed to set webhook:", e)
 
-    with open("polybot-dev.crt", "rb") as cert:
-        telegram_bot = Bot(token=TELEGRAM_BOT_TOKEN)
-        telegram_bot.set_webhook(
-            url="https://yazanpolybot-dev.fursa.click/",
-            certificate=cert
-        )
-
-    print("✅ Webhook set successfully")
-
-    # 👉 Start the Flask/FastAPI/whatever app
-    app.run(host='0.0.0.0', port=8443)
+    # Start the app anyway
+    app.run(host="0.0.0.0", port=8443)
 
