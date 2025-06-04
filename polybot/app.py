@@ -28,18 +28,20 @@ if __name__ == "__main__":
 
     try:
         with open("polybot/polybot-dev.crt", "rb") as cert:
-            telegram_bot = Bot(token=TELEGRAM_BOT_TOKEN)
-            asyncio.run(
-                telegram_bot.set_webhook(
-                    url="https://yazanpolybot-dev.fursa.click/",
-                    certificate=cert
+            info = bot.telegram_bot_client.get_webhook_info()
+            if info.url != "https://yazanpolybot-dev.fursa.click/":
+                asyncio.run(
+                    bot.telegram_bot_client.set_webhook(
+                        url="https://yazanpolybot-dev.fursa.click/",
+                        certificate=cert
+                    )
                 )
-            )
-
-            print("✅ Webhook set successfully")
+                print("✅ Webhook set successfully")
+            else:
+                print("ℹ️ Webhook already set")
     except Exception as e:
         print("⚠️ Failed to set webhook:", e)
 
-    # Start the app anyway
     app.run(host="0.0.0.0", port=8443)
+
 
