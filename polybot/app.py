@@ -3,6 +3,7 @@ from flask import request
 import os
 from .bot import Bot, QuoteBot, ImageProcessingBot
 from telegram import Bot
+import asyncio
 
 app = flask.Flask(__name__)
 
@@ -28,10 +29,13 @@ if __name__ == "__main__":
     try:
         with open("polybot/polybot-dev.crt", "rb") as cert:
             telegram_bot = Bot(token=TELEGRAM_BOT_TOKEN)
-            telegram_bot.set_webhook(
-                url="https://yazanpolybot-dev.fursa.click/",
-                certificate=cert
+            asyncio.run(
+                telegram_bot.set_webhook(
+                    url="https://yazanpolybot-dev.fursa.click/",
+                    certificate=cert
+                )
             )
+
             print("✅ Webhook set successfully")
     except Exception as e:
         print("⚠️ Failed to set webhook:", e)
