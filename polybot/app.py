@@ -2,6 +2,7 @@ import flask
 from flask import request
 import os
 from .bot import Bot, QuoteBot, ImageProcessingBot
+from telegram import Bot
 
 app = flask.Flask(__name__)
 
@@ -24,4 +25,17 @@ def webhook():
 if __name__ == "__main__":
     bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, BOT_APP_URL)
 
+    # 👇 TEMP: Set Telegram webhook with self-signed certificate
+
+    with open("polybot-dev.crt", "rb") as cert:
+        telegram_bot = Bot(token=TELEGRAM_BOT_TOKEN)
+        telegram_bot.set_webhook(
+            url="https://polybot-dev.fursa.click/",
+            certificate=cert
+        )
+
+    print("✅ Webhook set successfully")
+
+    # 👉 Start the Flask/FastAPI/whatever app
     app.run(host='0.0.0.0', port=8443)
+
