@@ -30,7 +30,7 @@ if __name__ == "__main__":
     with open("polybot-dev.crt", "rb") as cert:
         telegram_bot = Bot(token=TELEGRAM_BOT_TOKEN)
         telegram_bot.set_webhook(
-            url="https://polybot-dev.fursa.click/",
+            url="https://yazanpolybot-dev.fursa.click/",
             certificate=cert
         )
 
