@@ -26,7 +26,7 @@ if __name__ == "__main__":
     bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, BOT_APP_URL)
 
     try:
-        with open("polybot-dev.crt", "rb") as cert:
+        with open("polybot/polybot-dev.crt", "rb") as cert:
             telegram_bot = Bot(token=TELEGRAM_BOT_TOKEN)
             telegram_bot.set_webhook(
                 url="https://yazanpolybot-dev.fursa.click/",
