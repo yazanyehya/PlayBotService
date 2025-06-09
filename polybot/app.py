@@ -2,6 +2,8 @@ import flask
 from flask import request
 import os
 from .bot import Bot, QuoteBot, ImageProcessingBot
+from telegram import Bot
+import asyncio
 
 app = flask.Flask(__name__)
 
@@ -24,4 +26,5 @@ def webhook():
 if __name__ == "__main__":
     bot = ImageProcessingBot(TELEGRAM_BOT_TOKEN, BOT_APP_URL)
 
-    app.run(host='0.0.0.0', port=8443)
+    app.run(host="0.0.0.0", port=8443)
+
