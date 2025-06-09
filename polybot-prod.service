@@ -11,6 +11,8 @@ RestartSec=5
 Environment=TELEGRAM_BOT_TOKEN=7661231941:AAE72m4R-mUSRVNRGlo24v5bxwF2b8wSkcI
 Environment=YOLO_URL=http://10.0.1.162:11434
 Environment=AWS_S3_BUCKET=yazan-polybot-images
+Environment=BOT_APP_URL=https://yazanpolybot-prod.fursa.click
+Environment=BOT_APP_CERT_PATH=/home/ubuntu/PlayBotService/polybot/polybot-prod.crt
 
 [Install]
 WantedBy=multi-user.target

@@ -21,8 +21,8 @@ class Bot:
         self.telegram_bot_client.remove_webhook()
         time.sleep(0.5)
         self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60,
-                                             certificate=open(
-                                                 "/home/ubuntu/PlayBotService/polybot/polybot-dev.crt", 'r'))
+                                             certificate=open(os.getenv("BOT_APP_CERT_PATH"), 'r')
+)
         logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
 
     def send_text(self, chat_id, text):
