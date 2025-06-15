@@ -40,8 +40,7 @@ jobs:
       - name: Configure SSH
         env:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-          DEV_EC2_HOST: ${{ secrets.DEV_EC2_HOST }}
-          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+
 
         run: |
           mkdir -p ~/.ssh
@@ -50,15 +49,12 @@ jobs:
           echo "$SSH_PRIVATE_KEY" | wc -l
 
           cat > ~/.ssh/config << EOF
-          Host ec2
-            HostName $DEV_EC2_HOST
-            User $EC2_USERNAME
-            IdentityFile ~/.ssh/private_key
-            StrictHostKeyChecking no
-          EOF
         
 
       - name: Execute script on EC2
+        env:
+          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+          DEV_EC2_HOST: ${{ secrets.DEV_EC2_HOST }}
         run: |
           echo "✅ Deploying image: ${{ inputs.image }}"
           echo "ssh into the instance"
