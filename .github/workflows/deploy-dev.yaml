@@ -15,10 +15,6 @@ on:
         required: true
       TELEGRAM_BOT_TOKEN:
         required: true
-#     YOLO_IP_DEV:
-#       required: true
-#     AWS_S3_BUCKET_DEV:
-#       required: true
 
   workflow_dispatch:
     inputs:
@@ -53,7 +49,7 @@ jobs:
           chmod 600 ~/.ssh/private_key
           echo "$SSH_PRIVATE_KEY" | wc -l
 
-          cat > ~/.ssh/config <<EOF
+          cat > ~/.ssh/config << EOF
           Host ec2
             HostName $DEV_EC2_HOST
             User $EC2_USERNAME
@@ -70,10 +66,14 @@ jobs:
           echo "IMG_NAME=yazanyehya/${{ inputs.image }}" > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
           echo "TYPE_ENV=dev" >> .env
+          echo "before the scp"
 
           # Send files to EC2
-          scp .env docker-compose-dev.yaml otelcol-config.yaml ec2:~/
+          scp -i ~/.ssh/private_key -o StrictHostKeyChecking=no \
+          .env docker-compose-dev.yaml otelcol-config.yaml \
+          "$EC2_USERNAME@$DEV_EC2_HOST:~/"
 
+          echo "after the scp"
           # SSH into EC2 and deploy
           ssh ec2 '
             sudo apt-get update
