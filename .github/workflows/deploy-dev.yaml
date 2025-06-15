@@ -57,7 +57,8 @@ jobs:
       - name: Execute script on EC2
         run: |
           echo "✅ Deploying image: ${{ inputs.image }}"
-
+          ssh ec2
+          echo "ssh into the instance"
           # Generate .env file
           echo "IMG_NAME=yazanyehya/${{ inputs.image }}" > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
