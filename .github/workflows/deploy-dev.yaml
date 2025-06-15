@@ -1,5 +1,4 @@
-# .github/workflows/deploy-dev.yaml
-name: Polybot Deploy Dev
+git statusname: Polybot Deploy Dev
 
 on:
   workflow_call:
