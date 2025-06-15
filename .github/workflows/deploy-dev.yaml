@@ -15,16 +15,19 @@ on:
         required: true
       TELEGRAM_BOT_TOKEN:
         required: true
-#      YOLO_IP_DEV:
-#        required: true
-#      AWS_S3_BUCKET_DEV:
-#        required: true
+#     YOLO_IP_DEV:
+#       required: true
+#     AWS_S3_BUCKET_DEV:
+#       required: true
 
   workflow_dispatch:
     inputs:
       image:
+        description: "Image tag to deploy"
         required: true
         type: string
+
+
 
 env:
   REPO_URL: ${{ github.server_url }}/${{ github.repository }}.git
@@ -58,8 +61,6 @@ jobs:
           # Generate .env file
           echo "IMG_NAME=yazanyehya/${{ inputs.image }}" > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
-#          echo "YOLO_IP=${{ secrets.YOLO_IP_DEV }}" >> .env
-#          echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}" >> .env
           echo "TYPE_ENV=dev" >> .env
 
           # Send files to EC2
