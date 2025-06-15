@@ -4,34 +4,34 @@ on:
   push:
     branches:
       - dev
-
-jobs:
-  Build:
-    runs-on: ubuntu-latest
-    outputs:
-      image: ${{ steps.build-image-docker.outputs.image }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Build Docker image
-        id: build-image-docker
-        run: |
-          docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKERHUB_TOKEN }}"
-
-          IMAGE_TAG="polybot-dev:${{ github.run_number }}"
-          echo "image=$IMAGE_TAG" >> $GITHUB_OUTPUT
-
-          docker build --push -t $IMAGE_TAG .
-
-  Deploy:
-    needs: Build
-    uses: ./.github/workflows/deploy-dev.yaml
-    with:
-      image: ${{ needs.Build.outputs.image }}
-    secrets:
-      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      EC2_DEV_HOST: ${{ secrets.DEV_EC2_HOST }}
-      EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
-      TELEGRAM_TOKEN_DEV: ${{secrets.TELEGRAM_BOT_TOKEN}}
-      DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
+#
+#jobs:
+#  Build:
+#    runs-on: ubuntu-latest
+#    outputs:
+#      image: ${{ steps.build-image-docker.outputs.image }}
+#
+#    steps:
+#      - uses: actions/checkout@v4
+#
+#      - name: Build Docker image
+#        id: build-image-docker
+#        run: |
+#          docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKERHUB_TOKEN }}"
+#
+#          IMAGE_TAG="polybot-dev:${{ github.run_number }}"
+#          echo "image=$IMAGE_TAG" >> $GITHUB_OUTPUT
+#
+#          docker build --push -t $IMAGE_TAG .
+#
+#  Deploy:
+#    needs: Build
+#    uses: ./.github/workflows/deploy-dev.yaml
+#    with:
+#      image: ${{ needs.Build.outputs.image }}
+#    secrets:
+#      SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+#      EC2_DEV_HOST: ${{ secrets.DEV_EC2_HOST }}
+#      EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+#      TELEGRAM_TOKEN_DEV: ${{secrets.TELEGRAM_BOT_TOKEN}}
+#      DOCKERHUB_USERNAME: ${{secrets.DOCKERHUB_USERNAME}}
