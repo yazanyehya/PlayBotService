@@ -51,8 +51,8 @@ jobs:
           mkdir -p ~/.ssh
           echo "$SSH_PRIVATE_KEY" > ~/.ssh/private_key
           chmod 600 ~/.ssh/private_key
-          echo "🔐 First few lines of SSH_PRIVATE_KEY:"
-          echo "$SSH_PRIVATE_KEY" | head -n 5
+          echo "$SSH_PRIVATE_KEY" | wc -l
+
           cat > ~/.ssh/config <<EOF
           Host ec2
             HostName $DEV_EC2_HOST
