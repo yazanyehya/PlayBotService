@@ -64,7 +64,7 @@ jobs:
           echo "TYPE_ENV=dev" >> .env
 
           # Send files to EC2
-          scp .env docker-compose.dev.yaml otelcol-config.yaml ec2:~/
+          scp .env docker-compose-dev.yaml otelcol-config.yaml ec2:~/
 
           # SSH into EC2 and deploy
           ssh ec2 '
@@ -84,6 +84,6 @@ jobs:
             fi
 
             echo "✅ Starting Docker Compose services..."
-            sudo docker compose -f docker-compose.dev.yaml pull
-            sudo docker compose -f docker-compose.dev.yaml up -d
+            sudo docker compose -f docker-compose-dev.yaml pull
+            sudo docker compose -f docker-compose-dev.yaml up -d
           '
