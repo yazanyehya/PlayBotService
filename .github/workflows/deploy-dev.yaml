@@ -58,7 +58,7 @@ jobs:
           echo "IMG_NAME=yazanyehya/${{ inputs.image }}" > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
           echo "TYPE_ENV=dev" >> .env
-
+          echo "checking the ec2"
           # Send files to EC2
           scp .env docker-compose-dev.yaml otelcol-config.yaml ec2:~/
 
