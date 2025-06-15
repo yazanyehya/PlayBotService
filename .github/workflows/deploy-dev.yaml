@@ -1,4 +1,4 @@
-git statusname: Polybot Deploy Dev
+name: Polybot Deploy Dev
 
 on:
   workflow_call:
