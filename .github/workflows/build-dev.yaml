@@ -35,5 +35,5 @@ jobs:
       image: ${{ needs.Build.outputs.image }}
     secrets:
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
-      DEV_HOST: ${{ secrets.DEV_HOST }}
+      DEV_HOST: ${{ secrets.DEV_EC2_HOST }}
       SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
