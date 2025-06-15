@@ -64,7 +64,7 @@ jobs:
           echo "TYPE_ENV=dev" >> .env
 
           # Send files to EC2
-          scp .env docker-compose.dev.yaml otelcol-config.yaml ec2:~/
+          scp .env docker-compose-dev.yaml otelcol-config.yaml ec2:~/
 
           # SSH into EC2 and deploy
           ssh ec2 '
