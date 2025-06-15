@@ -1,0 +1,25 @@
+# Ignore node_modules or virtualenv
+node_modules
+venv
+__pycache__/
+
+# Ignore Python/TypeScript build artifacts
+*.pyc
+*.pyo
+*.pyd
+*.log
+dist
+build
+*.tsbuildinfo
+
+# Ignore environment files
+.env*
+!.env.dev  # (Optional: include this during dev only)
+
+# Ignore version control and editor configs
+.git
+.gitignore
+.dockerignore
+.vscode
+.idea
+
