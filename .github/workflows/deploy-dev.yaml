@@ -47,23 +47,18 @@ jobs:
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/private_key
           chmod 600 ~/.ssh/private_key
           cat > ~/.ssh/config << EOF
-          Host ec2
-              HostName ${{ secrets.DEV_EC2_HOST }}
-              User ${{ secrets.EC2_USERNAME }}
-              IdentityFile ~/.ssh/private_key
-              StrictHostKeyChecking no
-          EOF
+          ssh -i ~/.ssh/private_key -o StrictHostKeyChecking=no ${{ secrets.EC2_USERNAME }}@${{ secrets.DEV_EC2_HOST }}
+
 
       - name: Execute script on EC2
         run: |
           echo "✅ Deploying image: ${{ inputs.image }}"
-          ssh ec2
           echo "ssh into the instance"
           # Generate .env file
           echo "IMG_NAME=yazanyehya/${{ inputs.image }}" > .env
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
           echo "TYPE_ENV=dev" >> .env
-
+          echo "checking the ec2"
           # Send files to EC2
           scp .env docker-compose-dev.yaml otelcol-config.yaml ec2:~/
 
