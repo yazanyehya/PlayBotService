@@ -1,45 +1,59 @@
-name: Yolo Dev Deploy
+# .github/workflows/deploy-dev.yaml
+name: Polybot Deploy Dev
 
 on:
-  push:
-    branches:
-      - dev
+  workflow_call:
+    inputs:
+      image:
+        required: true
+        type: string
   workflow_dispatch:
-
-env:
-  REPO_URL: ${{ github.server_url }}/${{ github.repository }}.git
-  REPO_NAME: ${{ github.event.repository.name }}
+    inputs:
+      image:
+        required: true
+        type: string
 
 jobs:
-  Deploy:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Deploy to Dev Server via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.DEV_HOST }}
+          username: ubuntu
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # Install Docker + Compose if missing
+            if ! command -v docker &> /dev/null; then
+              echo "Installing Docker..."
+              sudo apt update
+              sudo apt install -y ca-certificates curl gnupg lsb-release
 
-      - name: Configure SSH (shared key)
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-        run: |
-          mkdir -p ~/.ssh
-          echo "$SSH_PRIVATE_KEY" > ~/.ssh/private_key
-          chmod 400 ~/.ssh/private_key
+              sudo mkdir -p /etc/apt/keyrings
+              curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
-      - name: ✅ Test SSH connection to DEV
-        run: |
-          ssh -i ~/.ssh/private_key -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEV_EC2_HOST }} "echo ✅ Connected to YOLO Dev EC2!"
+              echo \
+                "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+                $(lsb_release -cs) stable" | \
+                sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
-      - name: 🔄 Pull or Clone Repository on DEV (force dev branch)
-        run: |
-          ssh -i ~/.ssh/private_key -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEV_EC2_HOST }} \
-          "if [ -d ~/${REPO_NAME} ]; then \
-            cd ~/${REPO_NAME} && git fetch origin && git checkout dev && git reset --hard origin/dev; \
-          else \
-            git clone -b dev ${REPO_URL} ~/${REPO_NAME}; \
-          fi"
+              sudo apt update
+              sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
-      - name: 🚀 Run Deploy Script on DEV
-        run: |
-          ssh -i ~/.ssh/private_key -o StrictHostKeyChecking=no ubuntu@${{ secrets.DEV_EC2_HOST }} \
-          "cd ~/${REPO_NAME} && bash deploy-dev.sh"
+              sudo usermod -aG docker ubuntu
+              newgrp docker
+            else
+              echo "Docker already installed"
+            fi
+
+            # Proceed with deployment
+            cd ~/polybot
+            git pull origin dev
+
+            echo "IMG_NAME=${{ inputs.image }}" > .env.dev
+            echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env.dev
+
+            docker compose -f docker-compose.dev.yaml pull
+            docker compose -f docker-compose.dev.yaml up -d --build
