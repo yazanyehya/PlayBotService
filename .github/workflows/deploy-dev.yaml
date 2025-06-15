@@ -45,7 +45,7 @@ jobs:
           chmod 600 ~/.ssh/private_key
           cat > ~/.ssh/config << EOF
           Host ec2
-              HostName ${{ secrets.EC2_DEV_HOST }}
+              HostName ${{ secrets.DEV_EC2_HOST }}
               User ${{ secrets.EC2_USERNAME }}
               IdentityFile ~/.ssh/private_key
               StrictHostKeyChecking no
@@ -57,9 +57,9 @@ jobs:
 
           # Generate .env file
           echo "IMG_NAME=yazanyehya/${{ inputs.image }}" > .env
-          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_TOKEN_DEV }}" >> .env
-          echo "YOLO_IP=${{ secrets.YOLO_IP_DEV }}" >> .env
-          echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}" >> .env
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
+#          echo "YOLO_IP=${{ secrets.YOLO_IP_DEV }}" >> .env
+#          echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}" >> .env
           echo "TYPE_ENV=dev" >> .env
 
           # Send files to EC2
