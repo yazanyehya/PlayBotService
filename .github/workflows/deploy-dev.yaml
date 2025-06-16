@@ -62,9 +62,9 @@ jobs:
         run: |
           echo "✅ Deploying image: ${{ inputs.image }}"
           echo "ssh into the instance"
-          echo "IMG_NAME=yazanyehya/${{ inputs.image }}" > .env
-          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env
-          echo "TYPE_ENV=dev" >> .env
+          echo "IMG_NAME=yazanyehya/${{ inputs.image }}" > .env.dev
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env.dev
+          echo "TYPE_ENV=dev" >> .env.dev
 
           # Send files to EC2
           scp .env docker-compose-dev.yaml otelcol-config.yaml ec2:~/
