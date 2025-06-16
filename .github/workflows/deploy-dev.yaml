@@ -72,9 +72,9 @@ jobs:
           echo "ssh into the instance"
           echo "IMG_NAME=yazanyehya/${{ inputs.image }}" > .env.dev
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env.dev
-          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_TOKEN_DEV }}" >> .env
-          echo "BOT_APP_URL=${{ secrets.BOT_APP_URL }}" >> .env
-          echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}" >> .env
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_TOKEN_DEV }}" >> .env.dev
+          echo "BOT_APP_URL=${{ secrets.BOT_APP_URL }}" >> .env.dev
+          echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}" >> .env.dev
           echo "TYPE_ENV=dev" >> .env.dev
           
           # Send files to EC2
