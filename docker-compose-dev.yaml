@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   polybot-dev:
-    image: "${IMG_NAME}"
+    image: yazanyehya/polybot-dev:46
     env_file:
       - .env.dev
     restart: unless-stopped
