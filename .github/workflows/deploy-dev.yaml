@@ -15,6 +15,10 @@ on:
         required: true
       TELEGRAM_BOT_TOKEN:
         required: true
+      BOT_APP_URL:
+        required: true
+      AWS_S3_BUCKET_DEV:
+        required: true
 
   workflow_dispatch:
     inputs:
@@ -42,6 +46,10 @@ jobs:
           SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
           DEV_EC2_HOST: ${{ secrets.DEV_EC2_HOST }}
           EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+          TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
+          BOT_APP_URL: ${{secrets.BOT_APP_URL}}
+          AWS_S3_BUCKET_DEV: ${{secrets.AWS_S3_BUCKET_DEV}}
+
 
         run: |
           mkdir -p ~/.ssh
@@ -64,8 +72,11 @@ jobs:
           echo "ssh into the instance"
           echo "IMG_NAME=yazanyehya/${{ inputs.image }}" > .env.dev
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env.dev
+          echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_TOKEN_DEV }}" >> .env
+          echo "BOT_APP_URL=${{ secrets.BOT_APP_URL }}" >> .env
+          echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}" >> .env
           echo "TYPE_ENV=dev" >> .env.dev
-
+          
           # Send files to EC2
           scp .env.dev docker-compose-dev.yaml otelcol-config.yaml ec2:~/
 

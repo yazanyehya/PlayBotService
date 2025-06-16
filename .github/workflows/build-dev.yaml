@@ -34,3 +34,5 @@ jobs:
       DEV_EC2_HOST: ${{ secrets.DEV_EC2_HOST }}
       EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
       TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
+      BOT_APP_URL: ${{secrets.BOT_APP_URL}}
+      AWS_S3_BUCKET_DEV: ${{secrets.AWS_S3_BUCKET_DEV}}
