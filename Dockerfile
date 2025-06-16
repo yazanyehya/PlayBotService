@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y \
 
 # Copy only requirements.txt first (for better layer caching)
 COPY ./polybot/requirements.txt ./requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Install Python dependencies
 RUN pip install -r requirements.txt
