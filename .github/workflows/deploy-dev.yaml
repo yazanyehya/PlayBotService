@@ -99,6 +99,7 @@ jobs:
             fi
 
             echo "✅ Starting Docker Compose services..."
-            sudo docker compose -f docker-compose-dev.yaml pull
-            sudo docker compose -f docker-compose-dev.yaml up -d
+            sudo docker compose --env-file .env.dev -f docker-compose-dev.yaml pull
+            sudo docker compose --env-file .env.dev -f docker-compose-dev.yaml up -d
+
           EOF
