@@ -9,7 +9,7 @@ services:
     ports:
       - "8443:8443"
     volumes:
-      - /home/ubu ntu/polybot-dev.crt:/app/polybot-dev.crt
+      - /home/ubuntu/polybot-dev.crt:/app/polybot-dev.crt
 
   otelcol:
     image: otel/opentelemetry-collector-contrib:latest
