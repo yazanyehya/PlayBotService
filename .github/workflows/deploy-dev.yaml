@@ -19,6 +19,8 @@ on:
         required: true
       AWS_S3_BUCKET_DEV:
         required: true
+      BOT_APP_CERT_PATH:
+        required: true
 
   workflow_dispatch:
     inputs:
@@ -49,6 +51,8 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{secrets.TELEGRAM_BOT_TOKEN}}
           BOT_APP_URL: ${{secrets.BOT_APP_URL}}
           AWS_S3_BUCKET_DEV: ${{secrets.AWS_S3_BUCKET_DEV}}
+          BOT_APP_CERT_PATH: ${{secrets.BOT_APP_CERT_PATH}}
+
 
 
         run: |
@@ -74,6 +78,7 @@ jobs:
           echo "TELEGRAM_BOT_TOKEN=${{ secrets.TELEGRAM_BOT_TOKEN }}" >> .env.dev
           echo "BOT_APP_URL=${{ secrets.BOT_APP_URL }}" >> .env.dev
           echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}" >> .env.dev
+          echo "BOT_APP_CERT_PATH=${{ secrets.BOT_APP_CERT_PATH }}" >> .env.dev
           echo "TYPE_ENV=dev" >> .env.dev
           
           # Send files to EC2
