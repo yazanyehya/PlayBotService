@@ -37,3 +37,4 @@ jobs:
       BOT_APP_URL: ${{secrets.BOT_APP_URL}}
       AWS_S3_BUCKET_DEV: ${{secrets.AWS_S3_BUCKET_DEV}}
       BOT_APP_CERT_PATH: ${{secrets.BOT_APP_CERT_PATH}}
+      YOLO_URL: ${{secrets.YOLO_URL}}
