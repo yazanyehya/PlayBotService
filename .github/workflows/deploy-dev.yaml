@@ -21,6 +21,8 @@ on:
         required: true
       BOT_APP_CERT_PATH:
         required: true
+      YOLO_URL:
+        required: true
 
   workflow_dispatch:
     inputs:
@@ -52,6 +54,7 @@ jobs:
           BOT_APP_URL: ${{secrets.BOT_APP_URL}}
           AWS_S3_BUCKET_DEV: ${{secrets.AWS_S3_BUCKET_DEV}}
           BOT_APP_CERT_PATH: ${{secrets.BOT_APP_CERT_PATH}}
+          YOLO_URL: ${{secrets.YOLO_URL}}
 
 
 
@@ -79,6 +82,7 @@ jobs:
           echo "BOT_APP_URL=${{ secrets.BOT_APP_URL }}" >> .env.dev
           echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}" >> .env.dev
           echo "BOT_APP_CERT_PATH=${{ secrets.BOT_APP_CERT_PATH }}" >> .env.dev
+          echo "YOLO_URL=${{ secrets.YOLO_URL }}" >> .env.dev
           echo "TYPE_ENV=dev" >> .env.dev
           
           # Send files to EC2
