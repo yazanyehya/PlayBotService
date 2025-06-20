@@ -57,7 +57,7 @@ jobs:
           AWS_S3_BUCKET_DEV: ${{secrets.AWS_S3_BUCKET_DEV}}
           BOT_APP_CERT_PATH: ${{secrets.BOT_APP_CERT_PATH}}
           YOLO_URL: ${{secrets.YOLO_URL}}
-          SQS_QUEUE_URL: ${{secrets.SQS_QUEUE_URL}
+          SQS_QUEUE_URL: ${{secrets.SQS_QUEUE_URL}}
 
 
 
