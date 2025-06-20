@@ -23,6 +23,8 @@ on:
         required: true
       YOLO_URL:
         required: true
+      SQS_QUEUE_URL:
+        required: true
 
   workflow_dispatch:
     inputs:
@@ -55,6 +57,7 @@ jobs:
           AWS_S3_BUCKET_DEV: ${{secrets.AWS_S3_BUCKET_DEV}}
           BOT_APP_CERT_PATH: ${{secrets.BOT_APP_CERT_PATH}}
           YOLO_URL: ${{secrets.YOLO_URL}}
+          SQS_QUEUE_URL: ${{secrets.SQS_QUEUE_URL}
 
 
 
@@ -83,6 +86,7 @@ jobs:
           echo "AWS_S3_BUCKET=${{ secrets.AWS_S3_BUCKET_DEV }}" >> .env.dev
           echo "BOT_APP_CERT_PATH=${{ secrets.BOT_APP_CERT_PATH }}" >> .env.dev
           echo "YOLO_URL=${{ secrets.YOLO_URL }}" >> .env.dev
+          echo "SQS_QUEUE_URL=${{ secrets.SQS_QUEUE_URL }}" >> .env.dev
           echo "TYPE_ENV=dev" >> .env.dev
           
           # Send files to EC2
