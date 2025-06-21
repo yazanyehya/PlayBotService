@@ -29,6 +29,7 @@ def poll_prediction_and_respond(chat_id: int, prediction_id: str, bot):
     for attempt in range(MAX_RETRIES):
         try:
             res = requests.get(f"{YOLO_URL}/prediction/{prediction_id}")
+            print("🔥 RESPONSE JSON:", res.json())  # ADD THIS LINE
             if res.status_code == 200:
                 data = res.json()
                 labels = [d["label"] for d in data.get("detections", [])]
