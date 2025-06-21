@@ -13,7 +13,7 @@ import json
 
 
 YOLO_URL = os.environ.get("YOLO_URL")
-AWS_REGION = os.getenv("AWS_REGION", "eu-central-1")
+AWS_REGION = os.getenv("AWS_REGION", "us-west-1")
 AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
 SQS_QUEUE_URL = os.getenv("SQS_QUEUE_URL")
 
