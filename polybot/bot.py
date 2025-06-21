@@ -29,23 +29,24 @@ def poll_prediction_and_respond(chat_id: int, prediction_id: str, bot):
     for attempt in range(MAX_RETRIES):
         try:
             res = requests.get(f"{YOLO_URL}/prediction/{prediction_id}")
-            print("🔥 RESPONSE JSON:", res.json())  # ADD THIS LINE
-            if res.status_code == 200:
-                data = res.json()
-                label_counts = data.get("label_counts", {})
-                if label_counts:
-                    formatted = "\n".join([f"- {label} (×{count})" for label, count in label_counts.items()])
-                    bot.send_text(chat_id, f"🎯 Detected objects:\n{formatted}")
-                else:
-                    bot.send_text(chat_id, "✅ No objects detected.")
+            print(f"🔁 Attempt {attempt+1} - Status: {res.status_code}")
+            data = res.json()
+            print("🔥 RESPONSE JSON:", data)
 
-                return
+            label_counts = data.get("label_counts", {})
+            if label_counts:
+                formatted = "\n".join([f"- {label} (×{count})" for label, count in label_counts.items()])
+                bot.send_text(chat_id, f"🎯 Detected objects:\n{formatted}")
+            else:
+                bot.send_text(chat_id, "✅ No objects detected.")
+            return
         except Exception as e:
-            print(f"Error fetching prediction (try {attempt + 1}): {e}")
+            print(f"❌ Error fetching prediction (try {attempt + 1}): {e}")
 
         time.sleep(RETRY_DELAY)
 
     bot.send_text(chat_id, "⚠️ Still processing or failed to get results. Please try again later.")
+
 class Bot:
     def __init__(self, token, telegram_chat_url):
         self.telegram_bot_client = telebot.TeleBot(token)
