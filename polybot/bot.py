@@ -32,13 +32,13 @@ def poll_prediction_and_respond(chat_id: int, prediction_id: str, bot):
             print("🔥 RESPONSE JSON:", res.json())  # ADD THIS LINE
             if res.status_code == 200:
                 data = res.json()
-                labels = [d["label"] for d in data.get("detections", [])]
-                if labels:
-                    label_counts = Counter(labels)
+                label_counts = data.get("label_counts", {})
+                if label_counts:
                     formatted = "\n".join([f"- {label} (×{count})" for label, count in label_counts.items()])
                     bot.send_text(chat_id, f"🎯 Detected objects:\n{formatted}")
                 else:
                     bot.send_text(chat_id, "✅ No objects detected.")
+
                 return
         except Exception as e:
             print(f"Error fetching prediction (try {attempt + 1}): {e}")
