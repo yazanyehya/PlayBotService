@@ -1,0 +1,11 @@
+exemptions:
+  - cve: "CVE-2023-12345"
+    reason: "This CVE does not apply because the vulnerable component is not used"
+  - cve: "CVE-2024-56789"
+    reason: "We use an alternative implementation"
+
+rules:
+  critical: false
+  high: false
+  medium: false
+  low: false
