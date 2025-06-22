@@ -21,20 +21,20 @@ jobs:
       - name: Log in to Docker Hub
         uses: docker/login-action@v3
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build and push image (for analysis)
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKER_USERNAME }}/polybot-image:pr-${{ github.event.number }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/polybot-image:pr-${{ github.event.number }}
 
       - name: Docker Scout Scan
         uses: docker/scout-action@v1
         with:
-          image: ${{ secrets.DOCKER_USERNAME }}/polybot-image:pr-${{ github.event.number }}
+          image: ${{ secrets.DOCKERHUB_USERNAME }}/polybot-image:pr-${{ github.event.number }}
           only-severities: critical,high
           fail-on: critical,high
           sarif-file: scout-results.sarif
