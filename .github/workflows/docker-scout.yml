@@ -1,0 +1,39 @@
+name: Docker Scout Scan
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  scout:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: docker build -t polybot-image .
+
+      - name: Scan image with Docker Scout
+        id: scout
+        run: |
+          docker scout quickview polybot-image --exit-code high --only-severities critical,high --format sarif > scout-results.sarif
+
+      - name: Upload Scout report to PR
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: scout-results.sarif
+
+      - name: Comment summary in PR
+        if: always()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: scout-results.sarif
+          header: "🛡 Docker Scout Vulnerability Report"
