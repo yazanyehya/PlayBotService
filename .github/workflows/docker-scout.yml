@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  scout:
+  scan:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -15,25 +15,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
-      - name: Build Docker image
-        run: docker build -t polybot-image .
+      - name: Build and push image (for analysis)
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/polybot-image:pr-${{ github.event.number }}
 
-      - name: Scan image with Docker Scout
-        id: scout
-        run: |
-          docker scout quickview polybot-image --exit-code high --only-severities critical,high --format sarif > scout-results.sarif
+      - name: Docker Scout Scan
+        uses: docker/scout-action@v1
+        with:
+          image: ${{ secrets.DOCKER_USERNAME }}/polybot-image:pr-${{ github.event.number }}
+          only-severities: critical,high
+          fail-on: critical,high
+          sarif-file: scout-results.sarif
 
-      - name: Upload Scout report to PR
+      - name: Upload SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: scout-results.sarif
-
-      - name: Comment summary in PR
-        if: always()
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          path: scout-results.sarif
-          header: "🛡 Docker Scout Vulnerability Report"
