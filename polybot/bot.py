@@ -7,12 +7,20 @@ import requests
 from collections import Counter
 import boto3
 import os
+import uuid
+import requests
+import json
+
 
 YOLO_URL = os.environ.get("YOLO_URL")
-AWS_REGION = os.getenv("AWS_REGION", "eu-central-1")
+AWS_REGION = os.getenv("AWS_REGION", "us-west-1")
 AWS_S3_BUCKET = os.getenv("AWS_S3_BUCKET")
+SQS_QUEUE_URL = os.getenv("SQS_QUEUE_URL")
+
 
 s3_client = boto3.client("s3", region_name=AWS_REGION)
+sqs_client = boto3.client("sqs", region_name=AWS_REGION)
+
 
 
 class Bot:
@@ -20,7 +28,9 @@ class Bot:
         self.telegram_bot_client = telebot.TeleBot(token)
         self.telegram_bot_client.remove_webhook()
         time.sleep(0.5)
-        self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60)
+        self.telegram_bot_client.set_webhook(url=f'{telegram_chat_url}/{token}/', timeout=60,
+                                             certificate=open(os.getenv("BOT_APP_CERT_PATH"), 'r')
+)
         logger.info(f'Telegram Bot information\n\n{self.telegram_bot_client.get_me()}')
 
     def send_text(self, chat_id, text):
@@ -203,35 +213,29 @@ class ImageProcessingBot(Bot):
                 return
 
             # Check if detect is in commands
+            # Check if 'detect' is among the commands
             detect_commands = [cmd for cmd in commands if cmd[0] == 'detect']
             if detect_commands:
+                prediction_id = f"{uuid.uuid4()}"
+                message_payload = {
+                    "image_key": s3_key,
+                    "chat_id": chat_id,
+                    "prediction_id": prediction_id,
+                    "caption": caption  # Optional, useful if YOLO will use it
+                }
+
                 try:
-                    res = requests.post(
-                        f"{YOLO_URL}/predict",
-                        json={"image_key": s3_key}
+                    sqs_client.send_message(
+                        QueueUrl=SQS_QUEUE_URL,
+                        MessageBody=json.dumps(message_payload)
                     )
-
-                    if res.status_code != 200:
-                        try:
-                            error_msg = res.json().get("detail", res.text)
-                        except Exception:
-                            error_msg = res.text
-                        self.send_text(chat_id, f"❌ Object detection failed: {error_msg}")
-                        return
-
-                    result = res.json()
-                    labels = result.get('labels', [])
-                    if labels:
-                        label_counts = Counter(labels)
-                        formatted = "\n".join([f"- {label} (×{count})" for label, count in label_counts.items()])
-                        self.send_text(chat_id, f"🎯 Detected objects:\n{formatted}")
-                    else:
-                        self.send_text(chat_id, "✅ No objects detected.")
+                    logger.info(f"✅ SQS message sent with prediction ID: {prediction_id}")
+                    self.send_text(chat_id, "Your image is being processed. You’ll receive results shortly.")
 
                 except Exception as e:
-                    logger.exception("Detection failed")
-                    self.send_text(chat_id, "❌ Error during object detection.")
-                return  # Skip local filters if 'detect' was used
+                    logger.error(f"❌ Failed to send to SQS: {e}")
+                    self.send_text(chat_id, "❌ Failed to submit image for processing. Please try again.")
+                return  # Important: skip local image processing
 
             img = Img(image_path)
             for method_name, repeat in commands:
