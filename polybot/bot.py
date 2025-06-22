@@ -8,7 +8,7 @@ from collections import Counter
 import boto3
 import os
 import uuid
-from threading import Thread
+import requests
 import json
 
 
@@ -21,35 +21,37 @@ SQS_QUEUE_URL = os.getenv("SQS_QUEUE_URL")
 s3_client = boto3.client("s3", region_name=AWS_REGION)
 sqs_client = boto3.client("sqs", region_name=AWS_REGION)
 
+#
+# def poll_prediction_and_respond(chat_id: int, prediction_id: str, bot):
+#     MAX_RETRIES = 5
+#     RETRY_DELAY = 5  # seconds
+#
+#     for attempt in range(MAX_RETRIES):
+#         try:
+#             res = requests.get(f"{YOLO_URL}/prediction/{prediction_id}")
+#             print(f"🔁 Attempt {attempt + 1} - Status: {res.status_code}")
+#
+#             data = res.json()
+#             print("🔥 FULL JSON:", json.dumps(data, indent=2))
+#
+#             label_counts = data.get("label_counts")
+#             print("🔍 label_counts =", label_counts)
+#
+#             if label_counts and isinstance(label_counts, dict) and len(label_counts) > 0:
+#                 formatted = "\n".join([f"- {label} (×{count})" for label, count in label_counts.items()])
+#                 bot.send_text(chat_id, f"🎯 Detected objects:\n{formatted}")
+#             else:
+#                 bot.send_text(chat_id, "✅ No objects detected.")
+#             return
+#
+#         except Exception as e:
+#             print(f"❌ Error fetching prediction (try {attempt + 1}): {e}")
+#
+#         time.sleep(RETRY_DELAY)
+#
+#     bot.send_text(chat_id, "⚠️ Still processing or failed to get results. Please try again later.")
 
-def poll_prediction_and_respond(chat_id: int, prediction_id: str, bot):
-    MAX_RETRIES = 5
-    RETRY_DELAY = 5  # seconds
 
-    for attempt in range(MAX_RETRIES):
-        try:
-            res = requests.get(f"{YOLO_URL}/prediction/{prediction_id}")
-            print(f"🔁 Attempt {attempt + 1} - Status: {res.status_code}")
-
-            data = res.json()
-            print("🔥 FULL JSON:", json.dumps(data, indent=2))
-
-            label_counts = data.get("label_counts")
-            print("🔍 label_counts =", label_counts)
-
-            if label_counts and isinstance(label_counts, dict) and len(label_counts) > 0:
-                formatted = "\n".join([f"- {label} (×{count})" for label, count in label_counts.items()])
-                bot.send_text(chat_id, f"🎯 Detected objects:\n{formatted}")
-            else:
-                bot.send_text(chat_id, "✅ No objects detected.")
-            return
-
-        except Exception as e:
-            print(f"❌ Error fetching prediction (try {attempt + 1}): {e}")
-
-        time.sleep(RETRY_DELAY)
-
-    bot.send_text(chat_id, "⚠️ Still processing or failed to get results. Please try again later.")
 
 class Bot:
     def __init__(self, token, telegram_chat_url):
