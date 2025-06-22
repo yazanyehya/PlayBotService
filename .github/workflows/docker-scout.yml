@@ -5,7 +5,7 @@ on:
     branches: [ main ]
 
 jobs:
-  scan:
+  scout:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -24,22 +24,24 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and push image (for analysis)
+      - name: Build and push image for scan
         uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/polybot-image:pr-${{ github.event.number }}
 
-      - name: Docker Scout Scan
+      - name: Scan image with Docker Scout
         uses: docker/scout-action@v1
         with:
+          command: cves
           image: ${{ secrets.DOCKERHUB_USERNAME }}/polybot-image:pr-${{ github.event.number }}
           only-severities: critical,high
-          fail-on: critical,high
+          exit-code: 1
           sarif-file: scout-results.sarif
+          write-comment: true
 
-      - name: Upload SARIF to GitHub
+      - name: Upload Scout SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: scout-results.sarif
