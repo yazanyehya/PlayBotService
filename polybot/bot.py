@@ -244,7 +244,7 @@ class ImageProcessingBot(Bot):
             # Check if 'detect' is among the commands
             detect_commands = [cmd for cmd in commands if cmd[0] == 'detect']
             if detect_commands:
-                prediction_id = f"pred-{chat_id}-{uuid.uuid4()}"
+                prediction_id = f"{uuid.uuid4()}"
                 message_payload = {
                     "image_key": s3_key,
                     "chat_id": chat_id,
