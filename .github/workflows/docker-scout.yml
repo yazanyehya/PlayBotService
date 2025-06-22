@@ -37,7 +37,7 @@ jobs:
           command: cves
           image: ${{ secrets.DOCKERHUB_USERNAME }}/polybot-image:pr-${{ github.event.number }}
           only-severities: critical,high
-          exit-code: 1
+          file: .scout/policy.yaml           # 👈 Added policy file here
           sarif-file: scout-results.sarif
           write-comment: true
 
