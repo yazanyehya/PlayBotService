@@ -2,38 +2,37 @@ name: Docker Scout Scan
 
 on:
   pull_request:
-    branches: [ main ]
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
 
 jobs:
-  scout:
+  docker-scout:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pull-requests: write
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+    - name: Checkout code
+      uses: actions/checkout@v3
 
-      - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v3
 
-      - name: Build Docker image
-        run: docker build -t polybot-image .
 
-      - name: Scan image with Docker Scout
-        id: scout
-        run: |
-          docker scout quickview polybot-image --exit-code high --only-severities critical,high --format sarif > scout-results.sarif
-
-      - name: Upload Scout report to PR
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: scout-results.sarif
-
-      - name: Comment summary in PR
-        if: always()
-        uses: marocchino/sticky-pull-request-comment@v2
-        with:
-          path: scout-results.sarif
-          header: "🛡 Docker Scout Vulnerability Report"
+    - name: Build Docker image
+      run: |
+        docker login -u "${{ secrets.DOCKERHUB_USERNAME }}" -p "${{ secrets.DOCKERHUB_TOKEN }}"
+        docker build -t ${{ secrets.DOCKERHUB_USERNAME }}/polybot-scout:${{ github.sha }} .
+    - name: Run Docker Scout scan
+      uses: docker/scout-action@v1
+      with:
+        command: cves
+        image: ${{ secrets.DOCKERHUB_USERNAME }}/polybot-scout:${{ github.sha }}
+        only-severities: critical,high
+        exit-code: 1
+        summary: true
+        write-comment: true
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+        format: json
