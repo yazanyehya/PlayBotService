@@ -259,7 +259,8 @@ class ImageProcessingBot(Bot):
                     )
                     logger.info(f"✅ SQS message sent with prediction ID: {prediction_id}")
                     self.send_text(chat_id, "✅ Your image is being processed. You’ll receive results shortly.")
-                    Thread(target=poll_prediction_and_respond, args=(chat_id, prediction_id, self)).start()
+                    # sleep(10)
+                    # Thread(target=poll_prediction_and_respond, args=(chat_id, prediction_id, self)).start()
 
                 except Exception as e:
                     logger.error(f"❌ Failed to send to SQS: {e}")
