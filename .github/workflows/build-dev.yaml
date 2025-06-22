@@ -39,3 +39,5 @@ jobs:
       BOT_APP_CERT_PATH: ${{secrets.BOT_APP_CERT_PATH}}
       YOLO_URL: ${{secrets.YOLO_URL}}
       SQS_QUEUE_URL: ${{secrets.SQS_QUEUE_URL}}
+      SESSION_TABLE: ${{secrets.SESSION_TABLE_DEV}}
+      OBJECT_TABLE: ${{secrets.OBJECT_TABLE_DEV}}

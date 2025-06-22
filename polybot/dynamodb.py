@@ -2,12 +2,15 @@ import boto3
 import uuid
 from typing import List, Dict, Optional
 from boto3.dynamodb.conditions import Key
+import os
+SESSION_TABLE = os.getenv("SESSION_TABLE")
+OBJECT_TABLE = os.getenv("OBJECT_TABLE")
 
 class DynamoDBStorage():
     def __init__(self, region="us-west-1"):
         self.dynamodb = boto3.resource("dynamodb", region_name=region)
-        self.sessions_table = self.dynamodb.Table("yazan-dev-prediction_sessions")
-        self.objects_table = self.dynamodb.Table("yazan-dev-detection_objects")
+        self.sessions_table = self.dynamodb.Table(SESSION_TABLE)
+        self.objects_table = self.dynamodb.Table(OBJECT_TABLE)
 
     def get_prediction(self, uid: str) -> Optional[Dict]:
         print(f"🔍 Fetching prediction session with uid={uid}")
